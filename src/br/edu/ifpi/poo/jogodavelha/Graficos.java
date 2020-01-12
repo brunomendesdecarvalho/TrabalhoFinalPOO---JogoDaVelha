@@ -35,11 +35,11 @@ public class Graficos extends JPanel implements MouseListener{
 
 	public void carregarImagens() {
 		try {
-			tabuleiro = ImageIO.read(getClass().getResourceAsStream("/board.png"));
-			opX = ImageIO.read(getClass().getResourceAsStream("/redX.png"));
-			opO = ImageIO.read(getClass().getResourceAsStream("/redCircle.png"));
-			euX = ImageIO.read(getClass().getResourceAsStream("/blueX.png"));
-			euO = ImageIO.read(getClass().getResourceAsStream("/blueCircle.png"));
+			tabuleiro = ImageIO.read(getClass().getResourceAsStream("/tabuleiro.png"));
+			opX = ImageIO.read(getClass().getResourceAsStream("/opX.png"));
+			opO = ImageIO.read(getClass().getResourceAsStream("/opO.png"));
+			euX = ImageIO.read(getClass().getResourceAsStream("/euX.png"));
+			euO = ImageIO.read(getClass().getResourceAsStream("/euO.png"));
 		} catch (IOException e) {
 			System.out.println("Falha na conexão.");
 		}
@@ -61,18 +61,18 @@ public class Graficos extends JPanel implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (Servidor.requisicaoAceita) {
-			if (Servidor.meuTurno && !Servidor.falhaDeConexao && !JogoDaVelha.vitoria && !JogoDaVelha.derrota) {
-				int x = e.getX() / JogoDaVelha.tamEspaco;
-				int y = e.getY() / JogoDaVelha.tamEspaco;
+			if (Servidor.meuTurno && !Servidor.falhaDeConexao && !Classico.vitoria && !Classico.derrota) {
+				int x = e.getX() / Classico.tamEspaco;
+				int y = e.getY() / Classico.tamEspaco;
 				y *= 3;
 				int posicao = x + y;
 
-				if (JogoDaVelha.espacos[posicao] == null) {
-					if (!Servidor.circulo) { 
-						JogoDaVelha.espacos[posicao] = "X";
+				if (Classico.espacos[posicao] == null) {
+					if (!Servidor.cliente) { 
+						Classico.espacos[posicao] = "X";
 					}
 					else {
-						JogoDaVelha.espacos[posicao] = "O";
+						Classico.espacos[posicao] = "O";
 					}
 					Servidor.meuTurno = false;
 					repaint();
@@ -82,18 +82,20 @@ public class Graficos extends JPanel implements MouseListener{
 						Servidor.dos.writeInt(posicao);
 						Servidor.dos.flush();
 					} catch (IOException e1) {
-						JogoDaVelha.erros++;
+						Classico.erros++;
 						System.out.println("Falha na conexão.");
 					}
 
 					System.out.println("DADOS ENVIADOS.");
-					JogoDaVelha.checarVitoria();
-					JogoDaVelha.checarEmpate();
+					Classico.checarVitoria();
+					Classico.checarEmpate();
 
 				}
 			}
 		}
 	}
+	
+	
 
 	private void renderizar(Graphics g) {
 		g.drawImage(tabuleiro, 0, 0, null);
@@ -103,62 +105,62 @@ public class Graficos extends JPanel implements MouseListener{
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			int stringWidth = g2.getFontMetrics().stringWidth(stringSemConexao);
-			g.drawString(stringSemConexao, JogoDaVelha.LARGURA / 2 - stringWidth / 2, JogoDaVelha.LARGURA / 2);
+			g.drawString(stringSemConexao, Classico.LARGURA / 2 - stringWidth / 2, Classico.LARGURA / 2);
 
 		}
 
 		if (Servidor.requisicaoAceita) {
-			for (int i = 0; i < JogoDaVelha.espacos.length; i++) {
-				if (JogoDaVelha.espacos[i] != null) {
-					if (JogoDaVelha.espacos[i].equals("X")) {
-						if (Servidor.circulo) {
-							g.drawImage(opX, (i % 3) * JogoDaVelha.tamEspaco + 10 * (i % 3),
-									(int) (i / 3) * JogoDaVelha.tamEspaco + 10 * (int) (i / 3), null);
+			for (int i = 0; i < Classico.espacos.length; i++) {
+				if (Classico.espacos[i] != null) {
+					if (Classico.espacos[i].equals("X")) {
+						if (Servidor.cliente) {
+							g.drawImage(opX, (i % 3) * Classico.tamEspaco + 7 * (i % 3),
+									(int) (i / 3) * Classico.tamEspaco + 7 * (int) (i / 3), null);
 						} else {
-							g.drawImage(euX, (i % 3) * JogoDaVelha.tamEspaco + 10 * (i % 3),
-									(int) (i / 3) * JogoDaVelha.tamEspaco + 10 * (int) (i / 3), null);
+							g.drawImage(euX, (i % 3) * Classico.tamEspaco + 7 * (i % 3),
+									(int) (i / 3) * Classico.tamEspaco + 7 * (int) (i / 3), null);
 						}
-					} else if (JogoDaVelha.espacos[i].equals("O")) {
-						if (Servidor.circulo) {
-							g.drawImage(euO, (i % 3) * JogoDaVelha.tamEspaco + 10 * (i % 3),
-									(int) (i / 3) * JogoDaVelha.tamEspaco + 10 * (int) (i / 3), null);
+					} else if (Classico.espacos[i].equals("O")) {
+						if (Servidor.cliente) {
+							g.drawImage(euO, (i % 3) * Classico.tamEspaco + 7 * (i % 3),
+									(int) (i / 3) * Classico.tamEspaco + 7 * (int) (i / 3), null);
 						} else {
-							g.drawImage(opO, (i % 3) * JogoDaVelha.tamEspaco + 10 * (i % 3),
-									(int) (i / 3) * JogoDaVelha.tamEspaco + 10 * (int) (i / 3), null);
+							g.drawImage(opO, (i % 3) * Classico.tamEspaco + 7 * (i % 3),
+									(int) (i / 3) * Classico.tamEspaco + 7 * (int) (i / 3), null);
 						}
 					}
 				}
 			}
-			if (JogoDaVelha.vitoria || JogoDaVelha.derrota) {
+			if (Classico.vitoria || Classico.derrota) {
 				Graphics2D g2 = (Graphics2D) g;
-				g2.setStroke(new BasicStroke(10));
+				g2.setStroke(new BasicStroke(4));
 				g.setColor(Color.BLACK);
 				g.drawLine(
-						10 + JogoDaVelha.primEspaco % 3 * JogoDaVelha.tamEspaco + 10 * JogoDaVelha.primEspaco % 3
-								+ JogoDaVelha.tamEspaco / 2,
-						10 + (int) (JogoDaVelha.primEspaco / 3) * JogoDaVelha.tamEspaco
-								+ 10 * (int) (JogoDaVelha.primEspaco / 3) + JogoDaVelha.tamEspaco / 2,
-						10 + JogoDaVelha.segEspaco % 3 * JogoDaVelha.tamEspaco + 10 * JogoDaVelha.segEspaco % 3
-								+ JogoDaVelha.tamEspaco / 2,
-						10 + (int) (JogoDaVelha.segEspaco / 3) * JogoDaVelha.tamEspaco
-								+ 10 * (int) (JogoDaVelha.segEspaco / 3) + JogoDaVelha.tamEspaco / 2);
+						 Classico.primEspaco % 3 * Classico.tamEspaco + 7 * Classico.primEspaco % 3
+								+ Classico.tamEspaco / 2,
+						 (int) (Classico.primEspaco / 3) * Classico.tamEspaco
+								+ 7 * (int) (Classico.primEspaco / 3) + Classico.tamEspaco / 2,
+						 Classico.segEspaco % 3 * Classico.tamEspaco + 7 * Classico.segEspaco % 3
+								+ Classico.tamEspaco / 2,
+						 (int) (Classico.segEspaco / 3) * Classico.tamEspaco
+								+ 7 * (int) (Classico.segEspaco / 3) + Classico.tamEspaco / 2);
 
 				g.setColor(Color.GREEN);
 				g.setFont(fonteMaior);
-				if (JogoDaVelha.vitoria) {
+				if (Classico.vitoria) {
 					int larguraString = g2.getFontMetrics().stringWidth(stringVitoria);
-					g.drawString(stringVitoria, JogoDaVelha.LARGURA / 2 - larguraString / 2, JogoDaVelha.LARGURA / 2);
-				} else if (JogoDaVelha.derrota) {
+					g.drawString(stringVitoria, Classico.LARGURA / 2 - larguraString / 2, Classico.LARGURA / 2);
+				} else if (Classico.derrota) {
 					int larguraString = g2.getFontMetrics().stringWidth(stringDerrota);
-					g.drawString(stringDerrota, JogoDaVelha.LARGURA / 2 - larguraString / 2, JogoDaVelha.LARGURA / 2);
+					g.drawString(stringDerrota, Classico.LARGURA / 2 - larguraString / 2, Classico.LARGURA / 2);
 				}
 			}
-			if (JogoDaVelha.empate) {
+			if (Classico.empate) {
 				Graphics2D g2 = (Graphics2D) g;
 				g.setColor(Color.BLACK);
 				g.setFont(fonteMaior);
 				int larguraString = g2.getFontMetrics().stringWidth(stringEmpate);
-				g.drawString(stringEmpate, JogoDaVelha.LARGURA / 2 - larguraString / 2, JogoDaVelha.LARGURA / 2);
+				g.drawString(stringEmpate, Classico.LARGURA / 2 - larguraString / 2, Classico.LARGURA / 2);
 			}
 		} else {
 			g.setColor(Color.GREEN);
@@ -166,7 +168,7 @@ public class Graficos extends JPanel implements MouseListener{
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			int larguraString = g2.getFontMetrics().stringWidth(stringEsperando);
-			g.drawString(stringEsperando, JogoDaVelha.LARGURA / 2 - larguraString / 2, JogoDaVelha.LARGURA / 2);
+			g.drawString(stringEsperando, Classico.LARGURA / 2 - larguraString / 2, Classico.LARGURA / 2);
 		}
 
 	}
